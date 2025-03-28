@@ -1,0 +1,51 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    background-color:#f3f4ee;
+}
+
+.form-control {
+    border-radius: 12px !important;
+    margin:4px 0;
+}
+
+.custom-button {
+    background-color: #a57164 !important;
+    color: white;
+}
+
+.colorText {
+    color: #a57164 !important;
+}
+
+.input{
+    border-radius:5px;
+}
+
+.cardColor1 {
+    background-color: #ad9e81;
+}
+
+.cardColor2 {
+        background-color: #81a6ad;
+}
+.cardColor3 {
+        background-color: #9d9591;
+}

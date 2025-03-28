@@ -1,0 +1,7 @@
+﻿@{
+    Layout = "_Layout";
+    if (!User.Identity.IsAuthenticated)
+    {
+        Context.Response.Redirect("/Identity/Account/Login");
+    }
+}
