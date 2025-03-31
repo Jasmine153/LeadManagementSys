@@ -11,6 +11,7 @@ namespace LeadManagementSys.Models.DTOs
         public int TotalAdmins { get; set; }
         public int TotalAgents { get; set; }
         public int TotalManagers { get; set; }
-        //public int TotalLeads { get; set; }
+        public int TotalLeads { get; set; }
+        public List<LeadResponse> Leads { get; set; }
     }
 }

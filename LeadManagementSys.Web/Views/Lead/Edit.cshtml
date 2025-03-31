@@ -1,0 +1,31 @@
+﻿@model LeadManagementSys.Models.DTOs.LeadUpdateRequest
+
+@{
+    ViewData["Title"] = "Edit Lead";
+}
+
+<h2>Edit Lead</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Status" class="control-label">Status</label>
+        <select asp-for="Status" asp-items="Html.GetEnumSelectList<LeadManagementSys.Models.Enums.LeadStatus>()" class="form-control"></select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Remarks" class="control-label">Remarks</label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AssignedToId" class="control-label">Reassign Agent</label>
+        <select asp-for="AssignedToId" asp-items="ViewBag.AgentList" class="form-control">
+            <option value="">-- Select Agent --</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn custom-button mt-2">Save Changes</button>
+    <a href="javascript:history.back()" class="btn btn-secondary mt-2">Cancel</a>
+</form>

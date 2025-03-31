@@ -1,0 +1,37 @@
+﻿@model LeadManagementSys.Models.DTOs.LeadRequest
+@{
+    ViewData["Title"] = "Create Lead";
+}
+
+<h2>Create Lead</h2>
+
+<form asp-action="Create" method="post" class="mt-3">
+    <div class="mb-3">
+        <label asp-for="LeadName" class="form-label">Lead Name</label>
+        <input asp-for="LeadName" class="form-control" required />
+        <span asp-validation-for="LeadName" class="text-danger"></span>
+    </div>
+
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <div class="mb-3">
+            <label asp-for="AssignedToId" class="form-label">Assign To Agent</label>
+            <select asp-for="AssignedToId" asp-items="ViewBag.AgentList" class="form-control">
+                <option value="">-- Select Agent --</option>
+            </select>
+            <span asp-validation-for="AssignedToId" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" asp-for="AssignedToId" value="@ViewBag.AgentId" />
+    }
+
+    <div class="mb-3">
+        <label asp-for="Remarks" class="form-label">Remarks</label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn custom-button">Save Lead</button>
+    <a href="javascript:history.back()" class="btn btn-secondary mt-2">Cancel</a>
+</form>

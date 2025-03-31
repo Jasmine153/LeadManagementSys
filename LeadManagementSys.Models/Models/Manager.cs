@@ -8,7 +8,7 @@ namespace LeadManagementSys.Models.Models
 {
     public class Manager: ApplicationUser
     {
-        public string? AdminId { get; set; } // Reference to Admin
+        public string? AdminId { get; set; } 
         public Admin? Admin { get; set; }
         public ICollection<Agent>? Agents { get; set; }
     }

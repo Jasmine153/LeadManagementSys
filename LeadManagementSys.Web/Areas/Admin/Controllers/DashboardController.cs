@@ -1,15 +1,32 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LeadManagementSys.Handlers.SuperAdmin;
+using LeadManagementSys.Models.DTOs;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LeadManagementSys.Web.Areas.Admin.Controllers
+namespace LeadManagementSys.Web.Areas.SuperAdmin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin, Admin")]
     public class DashboardController : Controller
     {
-        public IActionResult Index()
+        private readonly IMediator _mediator;
+
+        public DashboardController(IMediator mediator)
         {
-            return View();
+            _mediator = mediator;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var summary = await _mediator.Send(new GetDashboardSummary());
+
+            if (summary == null)
+            {
+                return View(new DashboardSummaryDto());
+            }
+
+            return View(summary);
         }
     }
 }

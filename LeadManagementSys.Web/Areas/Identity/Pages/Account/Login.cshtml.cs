@@ -121,7 +121,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                         var roles = await _userManager.GetRolesAsync(user);
                         if (roles.Contains("SuperAdmin"))
                         {
-                            return LocalRedirect("/SuperAdmin/Dashboard/Index");
+                            return LocalRedirect("/Admin/Dashboard/Index");
                         }
                         else if (roles.Contains("Admin"))
                         {

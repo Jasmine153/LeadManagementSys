@@ -135,9 +135,9 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 user.FullName = Input.FullName;
 
-                // ✅ Set Email Correctly
+         
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                user.Email = Input.Email;  // <-- Fix Added Here
+                user.Email = Input.Email;
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
@@ -145,7 +145,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // ✅ Check and create role if it doesn't exist
+             
                     if (!await _roleManager.RoleExistsAsync(Input.Role))
                     {
                         var roleResult = await _roleManager.CreateAsync(new IdentityRole(Input.Role));
@@ -156,7 +156,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                         }
                     }
 
-                    // ✅ Assign role to user
+           
                     var roleAssignmentResult = await _userManager.AddToRoleAsync(user, Input.Role);
                     if (roleAssignmentResult.Succeeded)
                     {
@@ -167,18 +167,38 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                         _logger.LogError($"Failed to assign role {Input.Role} to user {user.Email}");
                     }
 
-                    // ✅ Redirect to login after registration
-                    return LocalRedirect("~/Identity/Account/Login");
+                    var currentUser = await _userManager.GetUserAsync(User);
+                 
+                    var userRoles = await _userManager.GetRolesAsync(currentUser);
+                    if (userRoles.Contains("SuperAdmin"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    }
+                    else if (userRoles.Contains("Admin"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    }
+                    else if (userRoles.Contains("Manager"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
+                    }
+                    else if (userRoles.Contains("Agent"))
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
+                    }
+
+                    return RedirectToAction("Index", "Home");
+
                 }
 
-                // Handle errors
+              
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            // If something goes wrong, redisplay form
+         
             return Page();
 }
 

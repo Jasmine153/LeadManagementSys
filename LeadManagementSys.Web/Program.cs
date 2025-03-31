@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using LeadManagementSys.Handlers.Leads;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,10 @@ builder.Services.AddDbContext<LeadDbContext>(options =>
     )
 ); 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetDashboardSummaryHandler).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteLeadHandler).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateLeadCommandHandler).Assembly));
+
+
 
 
 
@@ -32,6 +37,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<LeadDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireSuperAdmin", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireManager", policy => policy.RequireRole("Manager"));
+});
 
 builder.Services.AddSession(options =>
 {
@@ -64,6 +76,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
@@ -75,7 +88,11 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
 );
-
+app.MapControllerRoute(
+    name: "lead",
+    pattern: "Lead/{action}/{id?}",
+    defaults: new { controller = "Lead", action = "Index" }
+);
 
 app.MapControllerRoute(
     name: "default",

@@ -18,7 +18,7 @@ html {
 }
 
 body {
-    background-color:#f3f4ee;
+    background-color:#ffffff;
 }
 
 .form-control {
@@ -27,12 +27,12 @@ body {
 }
 
 .custom-button {
-    background-color: #a57164 !important;
+    background-color: black;
     color: white;
 }
 
 .colorText {
-    color: #a57164 !important;
+    color: black;
 }
 
 .input{
@@ -40,12 +40,21 @@ body {
 }
 
 .cardColor1 {
-    background-color: #ad9e81;
+    background-color: #F2D2BD;
 }
 
 .cardColor2 {
-        background-color: #81a6ad;
+    background-color: #ADD8E6;
 }
 .cardColor3 {
-        background-color: #9d9591;
+    background-color: #98FB98;
+}
+
+.cardColor4 {
+    background-color: #dcd0ff;
+}
+
+.custom-button:hover,
+.custom-button:focus {
+    color: #ADD8E6 !important;
 }

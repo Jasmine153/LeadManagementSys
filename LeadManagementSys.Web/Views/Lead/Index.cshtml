@@ -1,0 +1,62 @@
+﻿@model IEnumerable<LeadManagementSys.Models.DTOs.LeadResponse>
+@{
+    ViewData["Title"] = "Leads";
+}
+
+<h2>Leads</h2>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Lead</a>
+</p>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Lead Name</th>
+            <th>Assigned To</th>
+            <th>Status</th>
+            <th>Remarks</th>
+            <th>Created At</th>
+            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <th>Action</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var lead in Model)
+            {
+                <tr>
+                    <td>@lead.LeadName</td>
+                    <td>@lead.AssignedToName</td>
+                    <td>@lead.Status</td>
+                    <td>@lead.Remarks</td>
+                    <td>@lead.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <a asp-controller="Lead" asp-action="Edit" asp-route-id="@lead.Id" class="btn btn-warning btn-sm">Edit</a>
+                            <form asp-controller="Lead" asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete this lead?');">
+                                <input type="hidden" name="id" value="@lead.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Action</span>
+                        }
+                    </td>
+
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center text-danger">No leads found.</td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
