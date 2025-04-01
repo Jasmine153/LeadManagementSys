@@ -9,7 +9,7 @@ namespace LeadManagementSys.Models.Models
     public class Agent: ApplicationUser
     {
         public int NumberOfLeadsAssigned { get; set; } = 0;
-        public int MaxLeadLimit { get; set; } = 5;
+        public int MaxLeadLimit { get; set; } = 50;
         public string? ManagerId { get; set; } 
         public Manager? Manager { get; set; }
     }

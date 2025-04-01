@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +31,6 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        //private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -38,15 +38,12 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger)
-            //IEmailSender emailSender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _userStore = userStore;
-            //_emailStore = (IUserEmailStore<ApplicationUser>)GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
-            //_emailSender = emailSender;
         }
 
         /// <summary>
@@ -67,6 +64,10 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
+
+        public List<SelectListItem> Managers { get; set; }
+        public List<SelectListItem> Admins { get; set; }
+
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -110,6 +111,12 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
             [Display(Name = "Role")]
             public string Role { get; set; } = "Agent";
 
+            [Display(Name = "Select Manager (if role is Agent)")]
+            public string? SelectedManagerId { get; set; }
+
+            [Display(Name = "Select Admin (if role is Manager)")]
+            public string? SelectedAdminId { get; set; }
+
 
         }
 
@@ -123,6 +130,15 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                 Role = role 
             };
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            var managerUsers = await _userManager.GetUsersInRoleAsync("Manager");
+            Managers = managerUsers.Any()
+                ? managerUsers.Select(m => new SelectListItem { Value = m.Id, Text = m.FullName }).ToList()
+                : new List<SelectListItem>();
+
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            Admins = adminUsers.Any()
+                ? adminUsers.Select(a => new SelectListItem { Value = a.Id, Text = a.FullName }).ToList()
+                : new List<SelectListItem>();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -134,23 +150,46 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
                 user.FullName = Input.FullName;
-
-         
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 user.Email = Input.Email;
+
+                if (Input.Role == "Agent" && !string.IsNullOrEmpty(Input.SelectedManagerId))
+                {
+                    var agent = new LeadManagementSys.Models.Models.Agent
+                    {
+                        FullName = Input.FullName,
+                        Email = Input.Email,
+                        ManagerId = Input.SelectedManagerId,
+                        UserName = Input.Email
+                    };
+                    user = agent;
+                }
+                else if (Input.Role == "Manager" && !string.IsNullOrEmpty(Input.SelectedAdminId))
+                {
+                    var manager = new LeadManagementSys.Models.Models.Manager
+                    {
+                        FullName = Input.FullName,
+                        Email = Input.Email,
+                        AdminId = Input.SelectedAdminId,
+                        UserName = Input.Email
+                    };
+                    user = manager;
+                }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User {Email} created successfully with role {Role}.", user.Email, Input.Role);
+                    TempData["success"] = "User created successfully!";
 
-             
+
                     if (!await _roleManager.RoleExistsAsync(Input.Role))
                     {
                         var roleResult = await _roleManager.CreateAsync(new IdentityRole(Input.Role));
                         if (!roleResult.Succeeded)
                         {
+                            _logger.LogError("Failed to create role {Role}.", Input.Role);
                             ModelState.AddModelError("", "Failed to create role.");
                             return Page();
                         }
@@ -216,14 +255,5 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
-
-        //private IUserEmailStore<ApplicationUser> GetEmailStore()
-        //{
-        //    if (!_userManager.SupportsUserEmail)
-        //    {
-        //        throw new NotSupportedException("The default UI requires a user store with email support.");
-        //    }
-        //    return (IUserEmailStore<ApplicationUser>)_userStore;
-        //}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using LeadManagementSys.Data;
+using LeadManagementSys.Handlers.Agents;
 using LeadManagementSys.Handlers.Leads;
 using LeadManagementSys.Models.DTOs;
 using LeadManagementSys.Models.Enums;
@@ -47,8 +48,10 @@ namespace LeadManagementSys.Web.Controllers
                 var userId = _userManager.GetUserId(User);
                 var command = new CreateLeadCommand(leadRequest, userId);
                 var result = await _mediator.Send(command);
+             
                 if (result)
                 {
+                    TempData["success"] = "Lead created successfully!";
                     if (User.IsInRole("SuperAdmin"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                     if (User.IsInRole("Admin"))
@@ -58,6 +61,10 @@ namespace LeadManagementSys.Web.Controllers
                     if (User.IsInRole("Manager"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
                 }
+                //else
+                //{
+                //    TempData["error"] = "Failed to delete the lead!";
+                //}
             }
 
             return View(leadRequest);
@@ -73,6 +80,19 @@ namespace LeadManagementSys.Web.Controllers
             }
 
             return Json(leads);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedLeads()
+        {
+            var assignedLeads = await _mediator.Send(new GetDashboard());
+
+            if (assignedLeads == null)
+            {
+                return Json(new { message = "No leads found for this agent." });
+            }
+
+            return Json(assignedLeads.Leads); 
         }
 
         [HttpPost]
@@ -153,7 +173,6 @@ namespace LeadManagementSys.Web.Controllers
                     if (User.IsInRole("Agent"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
 
-                    // Default fallback
                     return RedirectToAction("Index", "Home");
                 }
             }

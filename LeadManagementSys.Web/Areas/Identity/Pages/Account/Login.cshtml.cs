@@ -118,6 +118,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
 
                     if (result.Succeeded)
                     {
+                        HttpContext.Session.SetString("UserId", user.Id);
                         var roles = await _userManager.GetRolesAsync(user);
                         if (roles.Contains("SuperAdmin"))
                         {
@@ -129,7 +130,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                         }
                         else if (roles.Contains("Agent"))
                         {
-                            return LocalRedirect("/Agent/Dashboard/Index");
+                            return LocalRedirect("/Agent/AgentDashboard/Index");
                         }
                         else if (roles.Contains("Manager"))
                         {

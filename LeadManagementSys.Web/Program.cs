@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using LeadManagementSys.Handlers.Leads;
-
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +45,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireManager", policy => policy.RequireRole("Manager"));
 });
 
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); 
@@ -60,6 +61,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
 
 var app = builder.Build();
 

@@ -36,7 +36,7 @@
             {
                 <div class="form-group">
                     <label asp-for="Input.Role" class="control-label"></label>
-                    <select asp-for="Input.Role" class="form-control">
+                    <select asp-for="Input.Role" class="form-control" id="roleSelect">
                         <option value="Admin">Admin</option>
                         <option value="Agent">Agent</option>
                         <option value="Manager">Manager</option>
@@ -47,6 +47,26 @@
             {
                 <input type="hidden" asp-for="Input.Role" value="@Model.Input.Role" />
                 <p><strong>Role:</strong> @Model.Input.Role</p>
+            }
+
+            @if(Model.Input.Role == "Agent")
+            {
+                <div id="managerDropdown" class="form-group" >
+                    <label asp-for="Input.SelectedManagerId" class="control-label">Select Manager</label>
+                    <select asp-for="Input.SelectedManagerId" asp-items="Model.Managers" class="form-control">
+                        <option value="">-- Select Manager --</option>
+                    </select>
+                </div>
+            }
+
+            @if (Model.Input.Role == "Manager")
+            {
+                <div id="adminDropdown" class="form-group" >
+                    <label asp-for="Input.SelectedAdminId" class="control-label">Select Admin</label>
+                <select asp-for="Input.SelectedAdminId" asp-items="Model.Admins" class="form-control">
+                    <option value="">-- Select Admin --</option>
+                </select>
+            </div>
             }
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg custom-button">Register</button>
         </form>
@@ -70,4 +90,20 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleDropdowns() {
+            var role = document.getElementById("roleSelect").value;
+            document.getElementById("managerDropdown").style.display = role === "Agent" ? "block" : "none";
+            document.getElementById("adminDropdown").style.display = role === "Manager" ? "block" : "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleDropdowns();
+        });
+
+        document.getElementById("roleSelect").addEventListener("change", toggleDropdowns);
+    </script>
+
 }
+
+

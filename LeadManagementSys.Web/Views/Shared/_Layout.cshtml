@@ -31,7 +31,7 @@
                             User.IsInRole("Agent") ? "Dashboard" :
                             User.IsInRole("Manager") ? "Dashboard" : "Home";
 
-                            var dashboardArea = User.IsInRole("SuperAdmin") ? "SuperAdmin" :
+                            var dashboardArea = User.IsInRole("SuperAdmin") ? "Admin" :
                             User.IsInRole("Admin") ? "Admin" :
                             User.IsInRole("Agent") ? "Agent" :
                             User.IsInRole("Manager") ? "Manager" : "";
