@@ -12,9 +12,13 @@ namespace LeadManagementSys.Models.DTOs
     {
         public int Id { get; set; }
         public string LeadName { get; set; } = string.Empty;
+
         [Required]
         public LeadStatus Status { get; set; }
-        public string? Remarks { get; set; }
+
         public string? AssignedToId { get; set; }
+
+        public string? Remarks { get; set; }
+        public List<string> ExistingRemarks { get; set; } = new();
     }
 }

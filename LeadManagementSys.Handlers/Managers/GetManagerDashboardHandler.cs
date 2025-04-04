@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,14 @@ namespace LeadManagementSys.Handlers.Managers
         private readonly LeadDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<GetManagerDashboardHandler> _logger;
 
-        public GetManagerDashboardHandler(LeadDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public GetManagerDashboardHandler(LeadDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, ILogger<GetManagerDashboardHandler> logger)
         {
             _context = context;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         public async Task<ManagerDashboardDto> Handle(GetManagerDashboard request, CancellationToken cancellationToken)
@@ -35,6 +38,7 @@ namespace LeadManagementSys.Handlers.Managers
                 throw new UnauthorizedAccessException("User not found in session.");
             }
 
+            _logger.LogInformation("Fetching manager dashboard");
 
             var manager = await _userManager.Users
                .OfType<Manager>()
@@ -57,19 +61,21 @@ namespace LeadManagementSys.Handlers.Managers
                 AgentId = agent.Id,
                 AgentName = agent.FullName,
                 Leads = _context.Leads
-                    .Where(l => l.AssignedToId == agent.Id)
-                    .Select(l => new LeadResponse
-                    {
-                        Id = l.Id,
-                        LeadName = l.LeadName,
-                        AssignedToName = agent.FullName,   
-                        Status = l.Status.ToString(),
-                        Remarks = l.Remarks,
-                        CreatedAt = l.CreatedAt
-                    })
-                    .ToList()
+          .Where(l => l.AssignedToId == agent.Id)
+          .Include(l => l.Remarks)
+          .Select(l => new LeadResponse
+          {
+              Id = l.Id,
+              LeadName = l.LeadName,
+              AssignedToName = agent.FullName,
+              Status = l.Status.ToString(),
+              CreatedAt = l.CreatedAt,
+              Remarks = l.Remarks.Select(r => r.Remark).ToList()
+          })
+          .ToList()
             }).ToList();
 
+            _logger.LogInformation("Dashboard prepared for Manager");
             return new ManagerDashboardDto
             {
                 TotalAgents = agentLeads.Count,

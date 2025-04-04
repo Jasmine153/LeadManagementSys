@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,19 @@ namespace LeadManagementSys.Handlers.Agents
             private readonly LeadDbContext _context;
             private readonly UserManager<ApplicationUser> _userManager;
             private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<GetDashboardHandler> _logger;
 
-            public GetDashboardHandler(LeadDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public GetDashboardHandler(LeadDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, ILogger<GetDashboardHandler> logger)
             {
                 _context = context;
                 _userManager = userManager;
                 _httpContextAccessor = httpContextAccessor;
-            }
+                _logger = logger;
+        }
 
         public async Task<AgentDashboardDto> Handle(GetDashboard request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Fetching agent dashboard data");
             var userId = _httpContextAccessor.HttpContext.Session.GetString("UserId");
 
             if (string.IsNullOrEmpty(userId))
@@ -52,11 +56,12 @@ namespace LeadManagementSys.Handlers.Agents
                     LeadName = l.LeadName,
                     AssignedToName = l.AssignedTo != null ? l.AssignedTo.FullName : "Unassigned",
                     Status = l.Status.ToString(),
-                    Remarks = l.Remarks,
+                    Remarks = l.Remarks.Select(r => r.Remark).ToList(),
                     CreatedAt = l.CreatedAt
                 })
                 .ToListAsync(cancellationToken);
-            Console.WriteLine($"Total leads found: {leads.Count}");
+            _logger.LogInformation("Total leads found for agent {AgentEmail}: {LeadCount}", currentUser.Email, leads.Count);
+
             return new AgentDashboardDto
             {
                 TotalLeads = leads.Count,

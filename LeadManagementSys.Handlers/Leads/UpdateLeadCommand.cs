@@ -10,11 +10,15 @@ namespace LeadManagementSys.Handlers.Leads
 {
     public class UpdateLeadCommand : IRequest<bool>
     {
-        public LeadUpdateRequest LeadRequest { get; }
+        public LeadUpdateRequest LeadRequest { get; set; }
+        public string UpdatedById { get; set; }
+        public string UpdatedByRole { get; set; }
 
-        public UpdateLeadCommand(LeadUpdateRequest leadRequest)
+        public UpdateLeadCommand(LeadUpdateRequest leadRequest, string updatedById, string updatedByRole)
         {
             LeadRequest = leadRequest;
+            UpdatedById = updatedById;
+            UpdatedByRole = updatedByRole;
         }
     }
 }

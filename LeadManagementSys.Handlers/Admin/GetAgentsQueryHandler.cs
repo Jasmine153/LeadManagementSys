@@ -4,6 +4,7 @@ using LeadManagementSys.Models.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,20 +17,23 @@ namespace LeadManagementSys.Handlers.Admin
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly LeadDbContext _context;
-
-        public GetAgentsQueryHandler(UserManager<ApplicationUser> userManager, LeadDbContext context)
+        private readonly ILogger<GetAgentsQueryHandler> _logger;
+        public GetAgentsQueryHandler(UserManager<ApplicationUser> userManager, LeadDbContext context, ILogger<GetAgentsQueryHandler> logger)
         {
             _userManager = userManager;
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<AgentResponse>> Handle(GetAgentsQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Fetching agents with assigned leads");
             var agents = await _context.Users
           .OfType<Agent>()
           .Include(a => a.Manager)
           .ToListAsync(cancellationToken);
 
+            _logger.LogInformation("Fetched agents from the database.");
             return agents.Select(a => new AgentResponse
             {
                 Id = a.Id,

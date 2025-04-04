@@ -62,3 +62,8 @@ body {
 .custom-button:focus {
     color: #ADD8E6 !important;
 }
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: black;
+    color: white;
+}

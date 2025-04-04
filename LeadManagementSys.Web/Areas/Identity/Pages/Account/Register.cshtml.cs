@@ -153,24 +153,33 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 user.Email = Input.Email;
 
-                if (Input.Role == "Agent" && !string.IsNullOrEmpty(Input.SelectedManagerId))
+                var userCurrent = await _userManager.GetUserAsync(User);
+                var currentUserRoles = await _userManager.GetRolesAsync(userCurrent);
+
+                if (Input.Role == "Agent")
                 {
+                    var managerId = !string.IsNullOrEmpty(Input.SelectedManagerId)
+                        ? Input.SelectedManagerId
+                        : currentUserRoles.Contains("Manager") ? userCurrent.Id : null;
                     var agent = new LeadManagementSys.Models.Models.Agent
                     {
                         FullName = Input.FullName,
                         Email = Input.Email,
-                        ManagerId = Input.SelectedManagerId,
+                        ManagerId = managerId,
                         UserName = Input.Email
                     };
                     user = agent;
                 }
-                else if (Input.Role == "Manager" && !string.IsNullOrEmpty(Input.SelectedAdminId))
+                else if (Input.Role == "Manager")
                 {
+                    var adminId = !string.IsNullOrEmpty(Input.SelectedAdminId)
+     ? Input.SelectedAdminId
+     : (currentUserRoles.Contains("Admin") || currentUserRoles.Contains("SuperAdmin")) ? userCurrent.Id : null;
                     var manager = new LeadManagementSys.Models.Models.Manager
                     {
                         FullName = Input.FullName,
                         Email = Input.Email,
-                        AdminId = Input.SelectedAdminId,
+                        AdminId = adminId,
                         UserName = Input.Email
                     };
                     user = manager;

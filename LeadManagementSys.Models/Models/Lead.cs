@@ -17,7 +17,7 @@ namespace LeadManagementSys.Models.Models
         public string? AssignedToId { get; set; }
         public ApplicationUser? AssignedTo { get; set; }
         public required LeadStatus Status { get; set; }
-        public required string? Remarks { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public virtual List<LeadRemark> Remarks { get; set; } = new List<LeadRemark>();
     }
 }

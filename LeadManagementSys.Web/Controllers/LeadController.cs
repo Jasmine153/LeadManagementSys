@@ -143,16 +143,14 @@ namespace LeadManagementSys.Web.Controllers
         }
 
 
-
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var lead = await _mediator.Send(new GetLeadByIdQuery(id));
+
             if (lead == null)
             {
-                _logger.LogWarning("Lead not found");
-                TempData["error"] = "Lead not found.";
-                return RedirectToAction("Index");
+                return NotFound();
             }
 
             var agents = await _userManager.GetUsersInRoleAsync("Agent");
@@ -162,17 +160,25 @@ namespace LeadManagementSys.Web.Controllers
         }
 
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(LeadUpdateRequest leadRequest)
         {
             if (ModelState.IsValid)
             {
-                var result = await _mediator.Send(new UpdateLeadCommand(leadRequest));
+                var user = await _userManager.GetUserAsync(User);
+                var userRoles = await _userManager.GetRolesAsync(user);
+                string role = userRoles.FirstOrDefault() ?? "Unknown";
+
+                var result = await _mediator.Send(new UpdateLeadCommand(leadRequest, user.Id, role));
+
                 if (result)
                 {
                     _logger.LogInformation("Lead updated successfully by user");
                     TempData["success"] = "Lead updated successfully.";
+
                     if (User.IsInRole("SuperAdmin"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 
@@ -188,14 +194,14 @@ namespace LeadManagementSys.Web.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
-            
+
             var agents = await _userManager.GetUsersInRoleAsync("Agent");
             ViewBag.AgentList = new SelectList(agents, "Id", "FullName", leadRequest.AssignedToId);
 
             TempData["error"] = "Error updating lead.";
             return View(leadRequest);
         }
-      
+
 
     }
 }

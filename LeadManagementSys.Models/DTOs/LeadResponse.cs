@@ -12,7 +12,8 @@ namespace LeadManagementSys.Models.DTOs
         public string LeadName { get; set; } = string.Empty;
         public string? AssignedToName { get; set; }
         public string Status { get; set; } = string.Empty;
-        public string? Remarks { get; set; }
         public DateTime CreatedAt { get; set; }
+        public List<string> Remarks { get; set; } = new List<string>();
+
     }
 }

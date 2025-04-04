@@ -10,7 +10,6 @@ namespace LeadManagementSys.Models.Enums
     {
         Pending,
         InProgress,
-        NotAssigned,
         Assigned,
         Completed
     }

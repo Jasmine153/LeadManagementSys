@@ -1,5 +1,6 @@
 ﻿using LeadManagementSys.Data;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace LeadManagementSys.Handlers.Leads
     public class DeleteLeadHandler : IRequestHandler<DeleteLeadCommand, bool>
     {
         private readonly LeadDbContext _context;
+        private readonly ILogger<DeleteLeadHandler> _logger;
 
-        public DeleteLeadHandler(LeadDbContext context)
+        public DeleteLeadHandler(LeadDbContext context, ILogger<DeleteLeadHandler> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<bool> Handle(DeleteLeadCommand request, CancellationToken cancellationToken)
@@ -25,6 +28,7 @@ namespace LeadManagementSys.Handlers.Leads
 
             _context.Leads.Remove(lead);
             await _context.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Lead deleted successfully.");
             return true;
         }
     }

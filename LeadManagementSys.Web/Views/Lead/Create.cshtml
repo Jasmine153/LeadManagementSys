@@ -30,11 +30,10 @@
     {
         <input type="hidden" asp-for="AssignedToId" value="@ViewBag.AgentId" />
     }
-
-    <div class="mb-3">
-        <label asp-for="Remarks" class="form-label">Remarks</label>
-        <textarea asp-for="Remarks" class="form-control"></textarea>
-    </div>
+            <div class="mb-3">
+                <label asp-for="Remarks" class="form-label">Initial Remark</label>
+                <textarea asp-for="Remarks" class="form-control"></textarea>
+            </div>
 
     <button type="submit" class="btn custom-button mt-2">Save Lead</button>
     <a href="javascript:history.back()" class="btn btn-secondary mt-2">Cancel</a>

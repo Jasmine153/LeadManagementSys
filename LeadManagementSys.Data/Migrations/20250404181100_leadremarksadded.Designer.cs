@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LeadManagementSys.Data.Migrations
 {
     [DbContext(typeof(LeadDbContext))]
-    [Migration("20250403062917_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250404181100_leadremarksadded")]
+    partial class leadremarksadded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,9 +119,6 @@ namespace LeadManagementSys.Data.Migrations
                     b.Property<string>("LeadName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -130,6 +127,41 @@ namespace LeadManagementSys.Data.Migrations
                     b.HasIndex("AssignedToId");
 
                     b.ToTable("Leads");
+                });
+
+            modelBuilder.Entity("LeadManagementSys.Models.Models.LeadRemark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LeadId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("LeadId");
+
+                    b.ToTable("LeadRemarks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -311,6 +343,25 @@ namespace LeadManagementSys.Data.Migrations
                     b.Navigation("AssignedTo");
                 });
 
+            modelBuilder.Entity("LeadManagementSys.Models.Models.LeadRemark", b =>
+                {
+                    b.HasOne("LeadManagementSys.Models.Models.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LeadManagementSys.Models.Models.Lead", "Lead")
+                        .WithMany("Remarks")
+                        .HasForeignKey("LeadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Lead");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -380,6 +431,11 @@ namespace LeadManagementSys.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("LeadManagementSys.Models.Models.Lead", b =>
+                {
+                    b.Navigation("Remarks");
                 });
 
             modelBuilder.Entity("LeadManagementSys.Models.Models.Admin", b =>

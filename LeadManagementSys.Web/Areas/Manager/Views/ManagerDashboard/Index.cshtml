@@ -44,16 +44,20 @@
                         <td>@lead.LeadName</td>
                         <td >@agent.AgentName</td>
                         <td>@lead.Status</td>
-                        <td>@lead.Remarks</td>
+                            <td>
+                                @if (lead.Remarks != null && lead.Remarks.Any())
+                                {
+                                    @string.Join(", ", lead.Remarks)
+                                }
+                                else
+                                {
+                                    <span>No Remarks</span>
+                                }
+                            </td>
                         <td>@lead.CreatedAt.ToShortDateString()</td>
                         <td>
                             <div class="d-flex gap-2">
                             <a href="/Lead/Edit/@lead.Id" class="btn custom-button btn-sm me-2">Edit</a>
-                            @* <form method="post" action="/Lead/Delete" onsubmit="return confirm('Are you sure you want to delete this lead?');"> *@
-                            @*     <input type="hidden" name="id" value="@lead.Id" /> *@
-                            @*     <button type="submit" class="btn btn-danger btn-sm">Delete</button> *@
-
-                            @* </form> *@
                                     <form id="deleteForm-@lead.Id" action="/Lead/Delete" method="post">
                                     <input type="hidden" name="id" value="@lead.Id" />
                                     <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@lead.Id')">Delete</button>

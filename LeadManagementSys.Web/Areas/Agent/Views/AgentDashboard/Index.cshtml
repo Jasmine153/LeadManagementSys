@@ -43,7 +43,16 @@
                         <td>@lead.LeadName</td>
                         <td>@lead.AssignedToName</td>
                         <td>@lead.Status</td>
-                        <td>@lead.Remarks</td>
+                        <td>
+                            @if (lead.Remarks != null && lead.Remarks.Any())
+                            {
+                                @string.Join(", ", lead.Remarks)
+                            }
+                            else
+                            {
+                                <span>No Remarks</span>
+                            }
+                        </td>
                         <td>@lead.CreatedAt.ToShortDateString()</td>
                         <td>
                             <a href="/Lead/Edit/@lead.Id" class="btn custom-button btn-sm">Edit</a>

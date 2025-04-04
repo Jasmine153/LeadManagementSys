@@ -2,10 +2,9 @@
 using LeadManagementSys.Models.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LeadManagementSys.Handlers.Leads
@@ -23,6 +22,7 @@ namespace LeadManagementSys.Handlers.Leads
         {
             var leads = await _context.Leads
                 .Include(l => l.AssignedTo)
+                .Include(l => l.Remarks)
                 .ToListAsync(cancellationToken);
 
             return leads.Select(l => new LeadResponse
@@ -31,7 +31,7 @@ namespace LeadManagementSys.Handlers.Leads
                 LeadName = l.LeadName,
                 AssignedToName = l.AssignedTo != null ? l.AssignedTo.FullName : "Unassigned",
                 Status = l.Status.ToString(),
-                Remarks = l.Remarks,
+                Remarks = l.Remarks.OrderByDescending(r => r.CreatedAt).Select(r => r.Remark).ToList(),
                 CreatedAt = l.CreatedAt
             }).ToList();
         }
