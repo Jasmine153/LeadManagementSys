@@ -1,4 +1,5 @@
-﻿using LeadManagementSys.Handlers.SuperAdmin;
+﻿using LeadManagementSys.Handlers.Admin;
+using LeadManagementSys.Handlers.SuperAdmin;
 using LeadManagementSys.Models.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,5 +29,19 @@ namespace LeadManagementSys.Web.Areas.SuperAdmin.Controllers
 
             return View(summary);
         }
+
+        public async Task<IActionResult> GetAgents()
+        {
+            var agents = await _mediator.Send(new GetAgentsQuery());
+            return Json(agents);
+        }
+
+        public async Task<IActionResult> GetManagers()
+        {
+            var managers = await _mediator.Send(new GetManagersQuery());
+            return Json(managers);
+        }
+
+
     }
 }

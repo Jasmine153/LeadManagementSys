@@ -1,4 +1,5 @@
 ﻿using LeadManagementSys.Data;
+using LeadManagementSys.Handlers.Admin;
 using LeadManagementSys.Handlers.Agents;
 using LeadManagementSys.Handlers.Leads;
 using LeadManagementSys.Models.DTOs;
@@ -17,15 +18,18 @@ namespace LeadManagementSys.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<LeadController> _logger;
 
-        public LeadController(IMediator mediator, UserManager<ApplicationUser> userManager)
+        public LeadController(IMediator mediator, UserManager<ApplicationUser> userManager, ILogger<LeadController> logger)
         {
             _mediator = mediator;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Create()
         {
+            _logger.LogInformation("Create Lead page accessed by {User}", User.Identity?.Name);
             if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 var agents = await _userManager.GetUsersInRoleAsync("Agent");
@@ -51,20 +55,24 @@ namespace LeadManagementSys.Web.Controllers
              
                 if (result)
                 {
-                    TempData["success"] = "Lead created successfully!";
+                    _logger.LogInformation("Lead created successfully by user");
+
+                  TempData["success"] = "Lead created successfully!";
                     if (User.IsInRole("SuperAdmin"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                     if (User.IsInRole("Admin"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                     if (User.IsInRole("Agent"))
-                        return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
+                        return RedirectToAction("Index", "AgentDashboard", new { area = "Agent" });
                     if (User.IsInRole("Manager"))
-                        return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
+                        return RedirectToAction("Index", "ManagerDashboard", new { area = "Manager" });
                 }
-                //else
-                //{
-                //    TempData["error"] = "Failed to delete the lead!";
-                //}
+                else
+                {
+                    _logger.LogWarning("Lead creation failed for user");
+                    TempData["error"] = "Failed to create lead.";
+                }
+
             }
 
             return View(leadRequest);
@@ -96,7 +104,7 @@ namespace LeadManagementSys.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "SuperAdmin, Admin, Manager")]
+        [Authorize(Roles = "SuperAdmin, Admin, Manager,Agent")]
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteLeadCommand(id);
@@ -104,10 +112,12 @@ namespace LeadManagementSys.Web.Controllers
 
             if (result)
             {
+                _logger.LogInformation("Lead deleted successfully by user");
                 TempData["success"] = "Lead deleted successfully!";
             }
             else
             {
+                _logger.LogWarning("Lead deletion failed for user");
                 TempData["error"] = "Failed to delete the lead!";
             }
             var currentUser = await _userManager.GetUserAsync(User);
@@ -122,11 +132,11 @@ namespace LeadManagementSys.Web.Controllers
             }
             else if (userRoles.Contains("Manager"))
             {
-                return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
+                return RedirectToAction("Index", "ManagerDashboard", new { area = "Manager" });
             }
             else if (userRoles.Contains("Agent"))
             {
-                return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
+                return RedirectToAction("Index", "AgentDashboard", new { area = "Agent" });
             }
 
             return RedirectToAction("Index", "Home");
@@ -140,6 +150,7 @@ namespace LeadManagementSys.Web.Controllers
             var lead = await _mediator.Send(new GetLeadByIdQuery(id));
             if (lead == null)
             {
+                _logger.LogWarning("Lead not found");
                 TempData["error"] = "Lead not found.";
                 return RedirectToAction("Index");
             }
@@ -160,6 +171,7 @@ namespace LeadManagementSys.Web.Controllers
                 var result = await _mediator.Send(new UpdateLeadCommand(leadRequest));
                 if (result)
                 {
+                    _logger.LogInformation("Lead updated successfully by user");
                     TempData["success"] = "Lead updated successfully.";
                     if (User.IsInRole("SuperAdmin"))
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
@@ -168,10 +180,10 @@ namespace LeadManagementSys.Web.Controllers
                         return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 
                     if (User.IsInRole("Manager"))
-                        return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
+                        return RedirectToAction("Index", "ManagerDashboard", new { area = "Manager" });
 
                     if (User.IsInRole("Agent"))
-                        return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
+                        return RedirectToAction("Index", "AgentDashboard", new { area = "Agent" });
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -183,7 +195,7 @@ namespace LeadManagementSys.Web.Controllers
             TempData["error"] = "Error updating lead.";
             return View(leadRequest);
         }
-
+      
 
     }
 }

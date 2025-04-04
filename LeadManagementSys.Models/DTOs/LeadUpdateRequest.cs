@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LeadManagementSys.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace LeadManagementSys.Models.DTOs
         public int Id { get; set; }
         public string LeadName { get; set; } = string.Empty;
         [Required]
-        public string Status { get; set; } = string.Empty;
+        public LeadStatus Status { get; set; }
         public string? Remarks { get; set; }
         public string? AssignedToId { get; set; }
     }

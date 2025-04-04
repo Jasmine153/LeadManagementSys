@@ -26,7 +26,7 @@ namespace LeadManagementSys.Web.Areas.Agent.Controllers
 
             if (summary == null)
             {
-                return View(new AgentDashboardDto());
+                return View(new AgentDashboardDto());  
             }
 
             return View(summary);

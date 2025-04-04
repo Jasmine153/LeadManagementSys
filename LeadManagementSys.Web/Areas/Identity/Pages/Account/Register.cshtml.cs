@@ -219,11 +219,11 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                     }
                     else if (userRoles.Contains("Manager"))
                     {
-                        return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
+                        return RedirectToAction("Index", "ManagerDashboard", new { area = "Manager" });
                     }
                     else if (userRoles.Contains("Agent"))
                     {
-                        return RedirectToAction("Index", "Dashboard", new { area = "Agent" });
+                        return RedirectToAction("Index", "AgentDashboard", new { area = "Agent" });
                     }
 
                     return RedirectToAction("Index", "Home");

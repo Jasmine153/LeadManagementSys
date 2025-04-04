@@ -19,14 +19,14 @@ namespace LeadManagementSys.Data
         {
             base.OnModelCreating(builder);
 
-            // TPH (Table Per Hierarchy) Mapping
+            
             builder.Entity<ApplicationUser>()
                 .HasDiscriminator<string>("UserType")
                 .HasValue<Admin>("Admin")
                 .HasValue<Manager>("Manager")
                 .HasValue<Agent>("Agent");
 
-            // Relationships
+            
             builder.Entity<Agent>()
                 .HasOne(a => a.Manager)
                 .WithMany(m => m.Agents)

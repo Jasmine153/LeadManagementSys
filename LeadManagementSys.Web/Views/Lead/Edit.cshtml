@@ -1,11 +1,22 @@
-﻿@model LeadManagementSys.Models.DTOs.LeadUpdateRequest
+﻿@using LeadManagementSys.Models.Models
+@model LeadManagementSys.Models.DTOs.LeadUpdateRequest
 
 @{
     ViewData["Title"] = "Edit Lead";
 }
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var userRoles = await UserManager.GetRolesAsync(currentUser);
+    var canReassign = userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin") || userRoles.Contains("Manager");
+}
 
-<h2>Edit Lead</h2>
 
+<div class="card shadow-lg p-3" style="border-radius: 10px;">
+    <div class="card-header bg-light text-dark">
+        <h3 class="mb-0">Edit Lead</h3>
+    </div>
+    <div class="card-body">
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
 
@@ -19,13 +30,18 @@
         <textarea asp-for="Remarks" class="form-control"></textarea>
     </div>
 
+    @if (canReassign)
+    {
     <div class="form-group">
         <label asp-for="AssignedToId" class="control-label">Reassign Agent</label>
         <select asp-for="AssignedToId" asp-items="ViewBag.AgentList" class="form-control">
             <option value="">-- Select Agent --</option>
         </select>
     </div>
+    }
 
     <button type="submit" class="btn custom-button mt-2">Save Changes</button>
     <a href="javascript:history.back()" class="btn btn-secondary mt-2">Cancel</a>
 </form>
+    </div>
+</div>

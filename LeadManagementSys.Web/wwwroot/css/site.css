@@ -41,17 +41,21 @@ body {
 
 .cardColor1 {
     background-color: #F2D2BD;
+    border-radius: 10px;
 }
 
 .cardColor2 {
     background-color: #ADD8E6;
+    border-radius: 10px;
 }
 .cardColor3 {
     background-color: #98FB98;
+    border-radius: 10px;
 }
 
 .cardColor4 {
     background-color: #dcd0ff;
+    border-radius: 10px;
 }
 
 .custom-button:hover,

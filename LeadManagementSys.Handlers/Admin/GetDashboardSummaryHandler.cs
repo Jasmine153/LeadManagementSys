@@ -40,13 +40,39 @@ namespace LeadManagementSys.Features.SuperAdmin.Dashboard
                    CreatedAt = l.CreatedAt
                }).ToListAsync(cancellationToken);
 
+            var agents = await _userManager.GetUsersInRoleAsync("Agent");
+            var agentList = agents.Select(a => new AgentResponse
+            {
+                Id = a.Id,
+                Name = a.FullName,
+                Email = a.Email,
+                NumberOfLeadsAssigned = _context.Leads.Count(l => l.AssignedToId == a.Id)
+            }).ToList();
+
+            
+            var managers = await _userManager.GetUsersInRoleAsync("Manager");
+            var managerList = managers.Select(m => new ManagerResponse
+            {
+                Id = m.Id,
+                Name = m.FullName,
+                Email = m.Email
+            }).ToList();
+
+            var leadsByStatus = await _context.Leads
+      .GroupBy(l => l.Status)
+      .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+      .ToDictionaryAsync(g => g.Status, g => g.Count, cancellationToken);
+
             return new DashboardSummaryDto
             {
                 TotalAdmins = totalAdmins,
                 TotalAgents = totalAgents,
                 TotalManagers = totalManagers,
                 TotalLeads = totalLeads,
-                Leads = leads
+                Leads = leads,
+                Agents = agentList,
+                Managers = managerList,
+                LeadsByStatus = leadsByStatus
             };
         }
     }

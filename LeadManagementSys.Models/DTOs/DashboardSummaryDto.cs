@@ -12,6 +12,9 @@ namespace LeadManagementSys.Models.DTOs
         public int TotalAgents { get; set; }
         public int TotalManagers { get; set; }
         public int TotalLeads { get; set; }
+        public Dictionary<string, int> LeadsByStatus { get; set; } = new Dictionary<string, int>();
         public List<LeadResponse> Leads { get; set; }
+        public List<AgentResponse> Agents { get; set; } = new();
+        public List<ManagerResponse> Managers { get; set; } = new();
     }
 }

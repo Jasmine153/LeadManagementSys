@@ -2,15 +2,17 @@
 @model RegisterModel
 
 @{
-    ViewData["Title"] = "Welcome";
+    ViewData["Title"] = "Create New User";
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<div class="row">
+<div class="row d-flex align-items-center mt-5">
     <div class="col-md-4">
+        <div class="card shadow-lg p-4" style="border-radius: 10px;">
+            <div class="card-body">
+                <section>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.FullName" class="form-control" autocomplete="username" aria-required="true" placeholder="Harry" />
@@ -52,7 +54,7 @@
             @if(Model.Input.Role == "Agent")
             {
                 <div id="managerDropdown" class="form-group" >
-                    <label asp-for="Input.SelectedManagerId" class="control-label">Select Manager</label>
+                                <label asp-for="Input.SelectedManagerId" class="control-label"><strong>Select Manager</strong></label>
                     <select asp-for="Input.SelectedManagerId" asp-items="Model.Managers" class="form-control">
                         <option value="">-- Select Manager --</option>
                     </select>
@@ -62,15 +64,22 @@
             @if (Model.Input.Role == "Manager")
             {
                 <div id="adminDropdown" class="form-group" >
-                    <label asp-for="Input.SelectedAdminId" class="control-label">Select Admin</label>
+                                <label asp-for="Input.SelectedAdminId" class="control-label">
+                                    <strong>Select Admin</strong>
+
+                            </label>
                 <select asp-for="Input.SelectedAdminId" asp-items="Model.Admins" class="form-control">
                     <option value="">-- Select Admin --</option>
                 </select>
             </div>
             }
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg custom-button">Register</button>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg custom-button mt-2">Register</button>
         </form>
+                </section>
+            </div>
+        </div>
     </div>
+
     <div class="col-md-6 col-md-offset-2">
         <section>
            

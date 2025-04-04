@@ -134,7 +134,7 @@ namespace LeadManagementSys.Web.Areas.Identity.Pages.Account
                         }
                         else if (roles.Contains("Manager"))
                         {
-                            return LocalRedirect("/Manager/Dashboard/Index");
+                            return LocalRedirect("/Manager/ManagerDashboard/Index");
                         }
                     }
                 }

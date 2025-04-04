@@ -33,7 +33,7 @@ namespace LeadManagementSys.Handlers.Leads
                 Id = lead.Id,
                 LeadName = lead.LeadName,
                 AssignedToId = lead.AssignedToId,
-                Status = lead.Status.ToString(),
+                Status = lead.Status,
                 Remarks = lead.Remarks
             };
         }
