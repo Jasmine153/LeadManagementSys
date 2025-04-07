@@ -12,8 +12,6 @@ namespace LeadManagementSys.Data
             : base(options)
         {
         }
-
-
         public DbSet<Lead> Leads { get; set; }
         public DbSet<LeadRemark> LeadRemarks { get; set; }
 
